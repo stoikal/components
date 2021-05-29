@@ -2,40 +2,40 @@ const template = document.createElement('template');
 template.innerHTML = `
   <style>
     .container {
+      width: 100%;
+      height: 100%;
       display: flex;
       background-color: grey;
+      overflow: hidden;
+      padding: 8px 0;
     }
 
-    resizeable-panel {
+    ::slotted(resizeable-panel) {
       flex: 1;
-      background-color: red;
+      background-color: white;
+
     }
 
-    .resizer {
-      width: 48px;
+    ::slotted(.panel-resizer) {
+      width: 16px;
       min-height: 48px;
       cursor: ew-resize;
-      background-color: white;
+      display: grid;
+      place-content: center;
+      user-select: none;
     }
 
+    ::slotted(.resizer-symbol) {
+      background-color: black;
+      width: 4px;
+      height: 10px;
+    }
   </style>
 
   <div class="container">
+    <slot></slot>
   </div>
 `;
-
-// function throttle (callback, limit) {
-//   var waiting = false;                      // Initially, we're not waiting
-//   return function () {                      // We return a throttled function
-//       if (!waiting) {                       // If we're not waiting
-//           callback.apply(this, arguments);  // Execute users function
-//           waiting = true;                   // Prevent future invocations
-//           setTimeout(function () {          // After a period of time
-//               waiting = false;              // And allow future invocations
-//           }, limit);
-//       }
-//   }
-// }
 
 class ResizeablePanelsContainer extends HTMLElement {
   constructor() {
@@ -48,10 +48,10 @@ class ResizeablePanelsContainer extends HTMLElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  _createMouseListener($resizer, index) {
+  _createMouseListener($resizer) {
     const resize = (event) => {
-      const $left = this.$panels[index - 1];
-      const $right = this.$panels[index];
+      const $left = $resizer.previousElementSibling;
+      const $right = $resizer.nextElementSibling;
 
       const left = $left.getBoundingClientRect();
       const right = $right.getBoundingClientRect();
@@ -75,22 +75,16 @@ class ResizeablePanelsContainer extends HTMLElement {
 
   connectedCallback() {
     this.$container = this._shadowRoot.querySelector('.container');
-    this.$panels = Array
-      .from(this.children)
-      .filter((elmt) => elmt.nodeName === this._acceptedChildrenName);
+    this.$children = Array.from(this.children);
 
-    const containerTemplateColumns = [];
-
-    this.$panels.forEach((panel, index) => {
-      if (index) {
+    this.$children.forEach(($child, index) => {
+      if (index && $child.nodeName === this._acceptedChildrenName) {
         const $resizer = document.createElement('div');
-        $resizer.classList.add('resizer');
+        $resizer.classList.add('panel-resizer');
         $resizer.addEventListener('mousedown', this._createMouseListener($resizer, index));
-        containerTemplateColumns.push('minmax(0, max-content)');
-        this.$container.appendChild($resizer);
+
+        $child.parentNode.insertBefore($resizer, $child);
       }
-      containerTemplateColumns.push('minmax(0, 1fr)');
-      this.$container.appendChild(panel);
     });
   }
 }
