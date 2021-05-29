@@ -36,7 +36,7 @@ template.innerHTML = `
 
   <div class="tab-title-container">
   </div>
-  <slot>/slot>
+  <slot></slot>
 
 `;
 
