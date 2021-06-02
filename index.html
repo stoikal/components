@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>* {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .main-container {
+      height: 100vh;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .resizeable {
+      /* flex: 1; */
+      resize: horizontal;
+      border: 1px dashed blue;
+      width: 200px;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .panel-content {
+      width: 100%;
+      height: 100%;
+    }</style><title>Document</title><script defer="defer" src="bundle.js"></script></head><body><main><div class="main-container"><resizeable-panels-container><resizeable-panel><textarea class="panel-content">Panel 1
+          </textarea></resizeable-panel><resizeable-panel><div class="panel-content">Panel 2</div></resizeable-panel><resizeable-panel><div class="panel-content">Panel 3</div></resizeable-panel></resizeable-panels-container></div></main><tab-content><div class="panel-content">ohayo</div></tab-content><tab-content><div class="panel-content">hola</div></tab-content>--></body></html>
