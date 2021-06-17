@@ -100,7 +100,7 @@ class FloatingCard extends HTMLElement {
     const light = ((100) / offsetHeight) * offsetY;
 
     this.$card.style.transform = `
-      translateZ(10px)
+      translateZ(50px)
       rotateY(${tiltY}deg)
       rotateX(${tiltX}deg)
     `;
