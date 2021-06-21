@@ -1,3 +1,5 @@
+import traverseObject from '../utils/traverseObject';
+
 export default class Router {
   constructor(rootEl, routes) {
     this.$rootEl = rootEl;
@@ -5,15 +7,26 @@ export default class Router {
   }
 
   async _renderPage(urlStr) {
-    // before escaped: ^#(/[^#/\?]+)+(\?([^\?])+)?$
-    const pattern = /\^#\(\/\[\^\/\\\?#\]\+\)\+\(\\\?\(\[\^\\\?\]\)\+\)\?\$/;
+    const pattern = /^#(\/[^#/?]+\/?)+(\?([^#/?])*)?$/;
     const { hash } = new URL(urlStr);
 
     if (!pattern.test(hash)) return;
 
-    const pageContent = '<h1>hello world</h1>';
+    const [pathStr, query] = hash.split('?');
+    const fullPath = pathStr.replace(/(#\/)|(\/$)/g, '');
+    const paths = fullPath.split('/');
 
-    this.$rootEl.innerHTML = pageContent;
+    const bag = {
+      query,
+    };
+
+    console.log(paths, this._routes);
+    const pageContent = traverseObject(this._routes, paths, { resolver: 'index' });
+    try {
+      this.$rootEl.innerHTML = (pageContent || this._routes._404).render(bag);
+    } catch {
+      this.$rootEl.innerHTML = this._routes._error.render(bag);
+    }
   }
 
   init() {
