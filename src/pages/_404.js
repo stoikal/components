@@ -1,5 +1,5 @@
 export default {
   render() {
-    return '<h1>page not found</h1>';
+    return '<h1>not found</h1>';
   },
 };

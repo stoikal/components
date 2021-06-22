@@ -11,9 +11,9 @@ export default function traverseObject(obj, properties, options = {}) {
       let temp;
 
       if (isLastIndex && resolver) {
-        temp = temp[property]?.[resolver] || temp[property];
+        temp = value[property]?.[resolver] || value[property];
       } else {
-        temp = temp[property];
+        temp = value[property];
       }
 
       value = temp;

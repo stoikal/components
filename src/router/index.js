@@ -20,11 +20,17 @@ export default class Router {
       query,
     };
 
-    console.log(paths, this._routes);
-    const pageContent = traverseObject(this._routes, paths, { resolver: 'index' });
+    const pageContent = traverseObject(
+      this._routes,
+      paths,
+      {
+        resolver: 'index',
+      },
+    );
+
     try {
-      this.$rootEl.innerHTML = (pageContent || this._routes._404).render(bag);
-    } catch {
+      this.$rootEl.innerHTML = (pageContent?.render || this._routes._404.render)(bag);
+    } catch (e) {
       this.$rootEl.innerHTML = this._routes._error.render(bag);
     }
   }
