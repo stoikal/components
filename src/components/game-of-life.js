@@ -23,6 +23,7 @@ class GameOfLife extends HTMLElement {
         }
 
         canvas {
+          cursor: pointer;
           box-sizing: border-box;
           border: 1px solid #000000;
           border: none;
@@ -40,6 +41,7 @@ class GameOfLife extends HTMLElement {
           Your browser does not support HTML5 canvas.
         </canvas>
         <div class="panel">
+          <button type="button" class="clear">clear</button>
           <button type="button" class="pause">pause</button>
           <button type="button" class="play">play</button>
           <button type="button" class="step">step</button>
@@ -48,14 +50,18 @@ class GameOfLife extends HTMLElement {
     `;
 
     this.canvas = this._shadowRoot.querySelector('canvas');
+    this.clearBtn = this._shadowRoot.querySelector('.clear');
     this.pauseBtn = this._shadowRoot.querySelector('.pause');
     this.playBtn = this._shadowRoot.querySelector('.play');
     this.stepBtn = this._shadowRoot.querySelector('.step');
     this.ctx = this.canvas.getContext('2d');
 
-    this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32'];
+    this.colors = ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#BFDBF7', '#053C5E', '#650D1B'];
+    this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32', 'orange'];
+    this.colors = ['#FFFF82', '#ffff82', '#d6d472', '#b7b466', '#0F0326', '#E65F5C'];
+    this.gridColor = 'white';
     this.cellSize = 10;
-    this.delay = 200;
+    this.delay = 100;
     this.initialPercentageAlive = 15;
   }
 
@@ -73,9 +79,12 @@ class GameOfLife extends HTMLElement {
     this.offsetX = Math.floor((width % this.cellSize) / 2);
     this.offsetY = Math.floor((height % this.cellSize) / 2);
 
+    this.clearBtn.addEventListener('click', this.clear.bind(this));
     this.pauseBtn.addEventListener('click', this.pause.bind(this));
     this.playBtn.addEventListener('click', this.start.bind(this));
     this.stepBtn.addEventListener('click', this.step.bind(this));
+
+    this.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
 
     this.init();
   }
@@ -97,8 +106,7 @@ class GameOfLife extends HTMLElement {
       col.forEach((cell, y) => {
         this.ctx.beginPath();
         this.ctx.fillStyle = this.colors[cell * 4];
-        // eslint-disable-next-line prefer-destructuring
-        this.ctx.strokeStyle = 'white';
+        this.ctx.strokeStyle = this.gridColor;
         this.ctx.rect(
           this.offsetX + x * this.cellSize,
           this.offsetY + y * this.cellSize,
@@ -128,14 +136,16 @@ class GameOfLife extends HTMLElement {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  calculateNextState(currentState, numNeighbors) {
+  calculateNextState(prevState, numNeighbors) {
+    const currentState = prevState >= 1 ? 1 : prevState;
     let nextState = currentState ? currentState - 0.25 : 0;
-    if (!!Math.floor(currentState) && (numNeighbors === 2 || numNeighbors === 3)) {
+
+    if (currentState >= 1 && (numNeighbors === 2 || numNeighbors === 3)) {
       nextState = 1;
     }
 
-    if (!Math.floor(currentState) && numNeighbors === 3) {
-      nextState = 1;
+    if (currentState < 1 && numNeighbors === 3) {
+      nextState = 1.25;
     }
 
     return nextState;
@@ -152,7 +162,7 @@ class GameOfLife extends HTMLElement {
         Object.values(neighborsCoordinates).forEach(({ x: nX, y: nY }) => {
           const nCol = colArr[nX];
           if (nCol) {
-            if (nCol[nY] === 1) {
+            if (nCol[nY] >= 1) {
               neighbors += 1;
             }
           }
@@ -185,6 +195,29 @@ class GameOfLife extends HTMLElement {
 
   pause() {
     clearTimeout(this.timer);
+  }
+
+  clear() {
+    this.pause();
+    this.snapshot = this.snapshot.map((col) => (
+      col.map(() => 0)
+    ));
+    this.draw();
+  }
+
+  handleCanvasClick(e) {
+    this.pause();
+    const { left, top } = this.getBoundingClientRect();
+    const { clientX, clientY } = e;
+
+    const mouseX = clientX - left;
+    const mouseY = clientY - top;
+
+    const col = Math.floor((mouseX - this.offsetX) / this.cellSize);
+    const row = Math.floor((mouseY - this.offsetY) / this.cellSize);
+
+    this.snapshot[col][row] = Number(!(Math.floor(this.snapshot[col][row])));
+    this.draw();
   }
 
   init() {
