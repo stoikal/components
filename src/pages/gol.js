@@ -1,7 +1,7 @@
 export default {
   render() {
     return `
-      <div style="height: 600px">
+      <div style="height: 100vh">
         <game-of-life></game-of-life>
       </div>
     `;

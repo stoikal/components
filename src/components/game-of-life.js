@@ -16,32 +16,47 @@ class GameOfLife extends HTMLElement {
         }
 
         .panel {
+          display: none;
           position: absolute;
           bottom: 10px;
           right: 10px
         }
 
         canvas {
+          box-sizing: border-box;
           border: 1px solid #000000;
+          border: none;
+          background: #e8f5e9;
         }
-      
+        
+        button {
+          min-width: 44px;
+          min-height: 44px;
+        }
+
       </style>
       <div class="container">
         <canvas>
           Your browser does not support HTML5 canvas.
         </canvas>
-        <div class="panel"> 
+        <div class="panel">
+          <button type="button" class="pause">pause</button>
+          <button type="button" class="play">play</button>
           <button type="button" class="step">step</button>
         </div>
       </div>
     `;
 
     this.canvas = this.shadowRoot.querySelector('canvas');
+    this.pauseBtn = this.shadowRoot.querySelector('.pause');
+    this.playBtn = this.shadowRoot.querySelector('.play');
     this.stepBtn = this.shadowRoot.querySelector('.step');
     this.ctx = this.canvas.getContext('2d');
 
     this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32'];
     this.cellSize = 10;
+    this.delay = 200;
+    this.initialPercentageAlive = 15;
   }
 
   connectedCallback() {
@@ -58,7 +73,9 @@ class GameOfLife extends HTMLElement {
     this.offsetX = Math.floor((width % this.cellSize) / 2);
     this.offsetY = Math.floor((height % this.cellSize) / 2);
 
-    this.stepBtn.addEventListener('click', this.next.bind(this));
+    this.pauseBtn.addEventListener('click', this.pause.bind(this));
+    this.playBtn.addEventListener('click', this.start.bind(this));
+    this.stepBtn.addEventListener('click', this.step.bind(this));
 
     this.init();
   }
@@ -68,7 +85,7 @@ class GameOfLife extends HTMLElement {
     for (let x = 0; x < this.numCols; x += 1) {
       const colArr = [];
       for (let y = 0; y < this.numRows; y += 1) {
-        colArr.push(Math.round(Math.random() - 0.3));
+        colArr.push(Number(Math.random() < this.initialPercentageAlive / 100));
       }
       temp.push(colArr);
     }
@@ -144,17 +161,37 @@ class GameOfLife extends HTMLElement {
         return this.calculateNextState(cell, neighbors);
       })
     ));
+  }
 
+  step() {
+    this.pause();
+    this.next();
     this.draw();
+  }
+
+  loop() {
+    this.next();
+    this.draw();
+
+    this.timer = setTimeout(() => {
+      window.requestAnimationFrame(this.loop.bind(this));
+    }, this.delay);
+  }
+
+  start() {
+    this.pause();
+    window.requestAnimationFrame(this.loop.bind(this));
+  }
+
+  pause() {
+    clearTimeout(this.timer);
   }
 
   init() {
     this.randomize();
     this.draw();
 
-    setInterval(() => {
-      this.next();
-    }, 200);
+    this.start();
   }
 }
 
