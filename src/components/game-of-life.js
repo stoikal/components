@@ -50,18 +50,19 @@ class GameOfLife extends HTMLElement {
     `;
 
     this.canvas = this._shadowRoot.querySelector('canvas');
+    this.panel = this._shadowRoot.querySelector('.panel');
     this.clearBtn = this._shadowRoot.querySelector('.clear');
     this.pauseBtn = this._shadowRoot.querySelector('.pause');
     this.playBtn = this._shadowRoot.querySelector('.play');
     this.stepBtn = this._shadowRoot.querySelector('.step');
     this.ctx = this.canvas.getContext('2d');
 
-    this.colors = ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#BFDBF7', '#053C5E', '#650D1B'];
-    this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32', 'orange'];
-    this.colors = ['#FFFF82', '#ffff82', '#d6d472', '#b7b466', '#0F0326', '#E65F5C'];
+    this.colors = ['#FFFF82', '#ffff82', '#d6d472', '#b7b466', '#0F0326', '#451a34', '#7d3242', '#bd4e52', '#e65f5c'];
+    this.colors = ['#ffffff', '#e0dee3', '#c1bdc6', '#9f9aa8', '#0F0326', '#451a34', '#7d3242', '#bd4e52', '#e65f5c'];
+    this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32', '#2e7d32', '#2e7d32', '#2e7d32', '#ffa500'];
     this.gridColor = 'white';
     this.cellSize = 10;
-    this.delay = 100;
+    this.delay = 150;
     this.initialPercentageAlive = 15;
   }
 
@@ -102,11 +103,15 @@ class GameOfLife extends HTMLElement {
   }
 
   draw() {
+    this.ctx.strokeStyle = this.gridColor;
     this.snapshot.forEach((col, x) => {
       col.forEach((cell, y) => {
+        if (this.prevSnapshot && this.prevSnapshot[x] && this.prevSnapshot[x][y] === cell) {
+          return;
+        }
+
         this.ctx.beginPath();
         this.ctx.fillStyle = this.colors[cell * 4];
-        this.ctx.strokeStyle = this.gridColor;
         this.ctx.rect(
           this.offsetX + x * this.cellSize,
           this.offsetY + y * this.cellSize,
@@ -114,7 +119,6 @@ class GameOfLife extends HTMLElement {
           this.cellSize,
         );
         this.ctx.closePath();
-
         this.ctx.fill();
         this.ctx.stroke();
       });
@@ -140,18 +144,19 @@ class GameOfLife extends HTMLElement {
     const currentState = prevState >= 1 ? 1 : prevState;
     let nextState = currentState ? currentState - 0.25 : 0;
 
-    if (currentState >= 1 && (numNeighbors === 2 || numNeighbors === 3)) {
-      nextState = 1;
+    if (prevState >= 1 && (numNeighbors === 2 || numNeighbors === 3)) {
+      nextState = prevState > 1 ? prevState - 0.25 : 1;
     }
 
     if (currentState < 1 && numNeighbors === 3) {
-      nextState = 1.25;
+      nextState = 2;
     }
 
     return nextState;
   }
 
   next() {
+    this.prevSnapshot = this.snapshot;
     this.snapshot = this.snapshot.map((col, x, colArr) => (
       col.map((cell, y) => {
         const neighborsCoordinates = this.getNeighborsCoordinates({ x, y });
@@ -199,6 +204,7 @@ class GameOfLife extends HTMLElement {
 
   clear() {
     this.pause();
+    this.prevSnapshot = this.snapshot;
     this.snapshot = this.snapshot.map((col) => (
       col.map(() => 0)
     ));
@@ -207,6 +213,8 @@ class GameOfLife extends HTMLElement {
 
   handleCanvasClick(e) {
     this.pause();
+    this.panel.style.display = 'block';
+
     const { left, top } = this.getBoundingClientRect();
     const { clientX, clientY } = e;
 
