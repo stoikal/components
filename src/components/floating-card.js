@@ -14,8 +14,6 @@ class FloatingCard extends HTMLElement {
     super();
 
     this._shadowRoot = this.attachShadow({ mode: 'open' });
-    // this._shadowRoot.append(template.content.cloneNode(true));
-
     this._shadowRoot.innerHTML = `
       <style>
         * {

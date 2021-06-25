@@ -5,6 +5,7 @@ import './components/resizeable-panel';
 import './components/tabs-container';
 import './components/tab-content';
 import './components/floating-card';
+import './components/game-of-life';
 
 import routes from './router/routes';
 

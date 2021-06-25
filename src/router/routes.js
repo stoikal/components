@@ -4,6 +4,8 @@ import _error from '../pages/_error';
 import floatingCard from '../pages/floating-card';
 import resizeablePanel from '../pages/resizeable-panels';
 import tabsContainer from '../pages/tabs-container';
+import dev from '../pages/dev';
+import gol from '../pages/gol';
 
 export default {
   favorites,
@@ -12,4 +14,6 @@ export default {
   'floating-card': floatingCard,
   'resizeable-panels': resizeablePanel,
   'tabs-container': tabsContainer,
+  dev,
+  gol,
 };
