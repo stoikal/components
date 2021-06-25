@@ -33,6 +33,7 @@ class GameOfLife extends HTMLElement {
         button {
           min-width: 44px;
           min-height: 44px;
+          user-select: none;
         }
 
       </style>
@@ -95,7 +96,7 @@ class GameOfLife extends HTMLElement {
     for (let x = 0; x < this.numCols; x += 1) {
       const colArr = [];
       for (let y = 0; y < this.numRows; y += 1) {
-        colArr.push(Number(Math.random() < this.initialPercentageAlive / 100));
+        colArr.push(2 * Number(Math.random() < this.initialPercentageAlive / 100));
       }
       temp.push(colArr);
     }
@@ -224,6 +225,7 @@ class GameOfLife extends HTMLElement {
     const col = Math.floor((mouseX - this.offsetX) / this.cellSize);
     const row = Math.floor((mouseY - this.offsetY) / this.cellSize);
 
+    this.prevSnapshot = [...this.snapshot.map((subArr) => [...subArr])];
     this.snapshot[col][row] = Number(!(Math.floor(this.snapshot[col][row])));
     this.draw();
   }
