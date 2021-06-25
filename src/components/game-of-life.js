@@ -2,8 +2,8 @@ class GameOfLife extends HTMLElement {
   constructor() {
     super();
 
-    this.shadowRoot = this.attachShadow({ mode: 'open' });
-    this.shadowRoot.innerHTML = `
+    this._shadowRoot = this.attachShadow({ mode: 'open' });
+    this._shadowRoot.innerHTML = `
       <style>
         * {
           box-sizing: border-box;
@@ -47,10 +47,10 @@ class GameOfLife extends HTMLElement {
       </div>
     `;
 
-    this.canvas = this.shadowRoot.querySelector('canvas');
-    this.pauseBtn = this.shadowRoot.querySelector('.pause');
-    this.playBtn = this.shadowRoot.querySelector('.play');
-    this.stepBtn = this.shadowRoot.querySelector('.step');
+    this.canvas = this._shadowRoot.querySelector('canvas');
+    this.pauseBtn = this._shadowRoot.querySelector('.pause');
+    this.playBtn = this._shadowRoot.querySelector('.play');
+    this.stepBtn = this._shadowRoot.querySelector('.step');
     this.ctx = this.canvas.getContext('2d');
 
     this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32'];
