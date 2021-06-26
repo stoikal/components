@@ -86,7 +86,9 @@ class GameOfLife extends HTMLElement {
     this.playBtn.addEventListener('click', this.start.bind(this));
     this.stepBtn.addEventListener('click', this.step.bind(this));
 
-    this.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
+    this.canvas.addEventListener('mousedown', this.handleCanvasMouseDown.bind(this));
+    this.canvas.addEventListener('mousemove', this.handleCanvasMouseMove.bind(this));
+    this.canvas.addEventListener('mouseup', this.handleCanvasMouseUp.bind(this));
 
     this.init();
   }
@@ -232,8 +234,30 @@ class GameOfLife extends HTMLElement {
     this.draw();
   }
 
-  handleCanvasClick(e) {
+  handleCanvasMouseUp() {
+    this.mouseDown = false;
+  }
+
+  handleCanvasMouseMove(e) {
+    if (this.mouseDown && false) {
+      const { left, top } = this.getBoundingClientRect();
+      const { clientX, clientY } = e;
+
+      const mouseX = clientX - left;
+      const mouseY = clientY - top;
+
+      const col = Math.floor((mouseX - this.offsetX) / this.cellSize);
+      const row = Math.floor((mouseY - this.offsetY) / this.cellSize);
+
+      this.prevSnapshot = [...this.snapshot.map((subArr) => [...subArr])];
+      this.snapshot[col][row] = Number(!(Math.floor(this.snapshot[col][row])));
+      this.draw();
+    }
+  }
+
+  handleCanvasMouseDown(e) {
     this.pause();
+    this.mouseDown = true;
     this.panel.style.display = 'block';
 
     const { left, top } = this.getBoundingClientRect();
