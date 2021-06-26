@@ -59,12 +59,12 @@ class GameOfLife extends HTMLElement {
     this.ctx = this.canvas.getContext('2d');
 
     this.colors = ['#FFFF82', '#ffff82', '#d6d472', '#b7b466', '#0F0326', '#451a34', '#7d3242', '#bd4e52', '#e65f5c'];
-    this.colors = ['#ffffff', '#e0dee3', '#c1bdc6', '#9f9aa8', '#0F0326', '#451a34', '#7d3242', '#bd4e52', '#e65f5c'];
     this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32', '#2e7d32', '#2e7d32', '#2e7d32', '#ffa500'];
+    this.colors = ['#ffffff', '#e0dee3', '#c1bdc6', '#9f9aa8', '#0F0326', '#451a34', '#7d3242', '#bd4e52', '#e65f5c'];
     this.gridColor = 'white';
     this.cellSize = 10;
-    this.delay = 150;
-    this.initialPercentageAlive = 15;
+    this.delay = 100;
+    this.initialPercentageAlive = 30;
   }
 
   connectedCallback() {
@@ -103,6 +103,36 @@ class GameOfLife extends HTMLElement {
     this.snapshot = temp;
   }
 
+  drawCircle(cell, x, y) {
+    this.ctx.beginPath();
+    this.ctx.fillStyle = this.colors[cell * 4];
+
+    const r = this.cellSize / 2;
+    this.ctx.arc(
+      this.offsetX + x * this.cellSize + r,
+      this.offsetY + y * this.cellSize + r,
+      r,
+      0, 2 * Math.PI,
+    );
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.stroke();
+  }
+
+  drawRectangle(cell, x, y) {
+    this.ctx.beginPath();
+    this.ctx.fillStyle = this.colors[cell * 4];
+    this.ctx.rect(
+      this.offsetX + x * this.cellSize,
+      this.offsetY + y * this.cellSize,
+      this.cellSize,
+      this.cellSize,
+    );
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.stroke();
+  }
+
   draw() {
     this.ctx.strokeStyle = this.gridColor;
     this.snapshot.forEach((col, x) => {
@@ -111,17 +141,7 @@ class GameOfLife extends HTMLElement {
           return;
         }
 
-        this.ctx.beginPath();
-        this.ctx.fillStyle = this.colors[cell * 4];
-        this.ctx.rect(
-          this.offsetX + x * this.cellSize,
-          this.offsetY + y * this.cellSize,
-          this.cellSize,
-          this.cellSize,
-        );
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.stroke();
+        this.drawCircle(cell, x, y);
       });
     });
   }
