@@ -58,13 +58,13 @@ class GameOfLife extends HTMLElement {
     this.stepBtn = this._shadowRoot.querySelector('.step');
     this.ctx = this.canvas.getContext('2d');
 
-    this.colors = ['#FFFF82', '#ffff82', '#d6d472', '#b7b466', '#0F0326', '#451a34', '#7d3242', '#bd4e52', '#e65f5c'];
-    this.colors = ['#ffffff', '#ffffff', '#e8f5e9', '#c8e6c9', '#2e7d32', '#2e7d32', '#2e7d32', '#2e7d32', '#ffa500'];
+    // settings
     this.colors = ['#ffffff', '#e0dee3', '#c1bdc6', '#9f9aa8', '#0F0326', '#451a34', '#7d3242', '#bd4e52', '#e65f5c'];
-    this.gridColor = 'white';
-    this.cellSize = 10;
-    this.delay = 100;
-    this.initialPercentageAlive = 30;
+    this.gridColor = '#ffffff';
+    this.showGrid = false;
+    this.cellSize = 12;
+    this.minInterval = 100;
+    this.density = 0.375;
   }
 
   connectedCallback() {
@@ -98,7 +98,7 @@ class GameOfLife extends HTMLElement {
     for (let x = 0; x < this.numCols; x += 1) {
       const colArr = [];
       for (let y = 0; y < this.numRows; y += 1) {
-        colArr.push(2 * Number(Math.random() < this.initialPercentageAlive / 100));
+        colArr.push(2 * Number(Math.random() < this.density));
       }
       temp.push(colArr);
     }
@@ -118,7 +118,9 @@ class GameOfLife extends HTMLElement {
     );
     this.ctx.closePath();
     this.ctx.fill();
-    this.ctx.stroke();
+    if (this.showGrid) {
+      this.ctx.stroke();
+    }
   }
 
   drawRectangle(cell, x, y) {
@@ -132,7 +134,9 @@ class GameOfLife extends HTMLElement {
     );
     this.ctx.closePath();
     this.ctx.fill();
-    this.ctx.stroke();
+    if (this.showGrid) {
+      this.ctx.stroke();
+    }
   }
 
   draw() {
@@ -143,7 +147,7 @@ class GameOfLife extends HTMLElement {
           return;
         }
 
-        this.drawCircle(cell, x, y);
+        this.drawRectangle(cell, x, y);
       });
     });
   }
@@ -185,8 +189,6 @@ class GameOfLife extends HTMLElement {
         const neighborsCoordinates = this.getNeighborsCoordinates({ x, y });
         let neighbors = 0;
 
-        // console.log(x, y, neighborsCoordinates);
-
         Object.values(neighborsCoordinates).forEach(({ x: nX, y: nY }) => {
           const nCol = colArr[nX];
           if (nCol) {
@@ -213,7 +215,7 @@ class GameOfLife extends HTMLElement {
 
     this.timer = setTimeout(() => {
       window.requestAnimationFrame(this.loop.bind(this));
-    }, this.delay);
+    }, this.minInterval);
   }
 
   start() {
